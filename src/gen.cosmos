@@ -27,6 +27,7 @@ functor(Str, Functor)
 functor(Id, Functor)
 functor(ObjGet, Functor)
 functor(Func, Functor)
+functor(Goal, Functor)
 functor(TList, Functor Functor)
 functor(TTable, Functor Functor)
 functor(Op, Functor)
@@ -379,6 +380,11 @@ rel extract_name(Functor f, String s2, env, env2, String prefix, String module)
 			prefix='obj_get(Env0,"'+a+'","'+b+'",'+c+'),'
 		s2='closure('+c+',Env0)'
 		
+	elseif(f=Goal(name,args,info))
+		extract_args(args,sargs,env,_,prefix,module)
+		make_this_string('',name,sargs,prefix2)
+		s2=prefix+prefix2
+
 	elseif(f=Func(name,args,info))
 		if(name='Cons')
 			extract_args(args,sb,env,env2,prefix,module)

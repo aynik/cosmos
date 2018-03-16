@@ -45,6 +45,7 @@ functor(Str, Functor)
 functor(Id, Functor)
 functor(ObjGet, Functor)
 functor(Func, Functor)
+functor(Goal, Functor)
 functor(TList, Functor)
 functor(TTable, Functor)
 
@@ -140,6 +141,12 @@ rel parse_obj_get(l,tail,f)
 	l = Cons(Token(a,'id',_),Cons(Token(_,'.',_),Cons(Token(b,'id',_), tail)))
 	f=ObjGet(a,b)
 
+rel parse_gexp_call(l,tail,f)
+	l = Cons(Token(_,'@',_), Cons(Token(name,'id',_),Cons(Token(_,'(',_), l2)))
+	this.parse_args(l2,l3,args)
+	l3=Cons(Token(_,')',_),tail)
+	f=Goal(name,args,get_info(l))
+
 rel parse_exp_call(l,tail,f)
 	l = Cons(Token(name,'id',_),Cons(Token(_,'(',_), l2))
 	this.parse_args(l2,l3,args)
@@ -168,6 +175,7 @@ rel exp_to_functor(l,tail,f)
 rel parse_exp2(l,tail,f)
 	parse_exp_obj_call(l,tail,f) or
 	parse_obj_get(l,tail,f) or
+	parse_gexp_call(l,tail,f) or
 	parse_exp_call(l,tail,f) or
 	parse_list(l,tail,f) or
 	parse_table(l,tail,f) or

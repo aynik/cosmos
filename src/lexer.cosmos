@@ -170,6 +170,7 @@ rel step(s, Integer i, Integer j, z, info, info2)
 			this.match_string(s,i,j,'else') and z='else' or
 			this.match_string(s,i,j,'once') and z='once'
 		else
+			this.match_string(s,i,j,'@') and z='@' or
 			this.match_string(s,i,j,'!=') and z='!=' or
 			this.match_string(s,i,j,'::') and z='::' or
 			this.parse_id(s,i,j) and z='id' or
