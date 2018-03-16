@@ -26,10 +26,14 @@ logic.pl: list.pl string.pl math.pl
 
 io.pl: logic.pl
 
-stdlib-clean:
-	touch list.cosmos string.cosmos math.cosmos io.cosmos logic.cosmos table.cosmos
+net.pl:
 
-stdlib: list.pl string.pl math.pl io.pl logic.pl table.pl
+streampool.pl:
+
+stdlib-clean:
+	touch list.cosmos string.cosmos math.cosmos io.cosmos logic.cosmos table.cosmos net.cosmos streampool.cosmos
+
+stdlib: list.pl string.pl math.pl io.pl logic.pl table.pl net.pl streampool.pl
 
 # compiler
 types.pl:

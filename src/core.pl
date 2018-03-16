@@ -1,6 +1,8 @@
 :- use_module(library(clpfd)).
 :- use_module(library(clpr)).
 :- use_module(library(assoc)).
+:- use_module(library(socket)).
+:- use_module(library(streampool)).
 
 add(X,Y,Z) :- fd_add(X,Y,Z).
 sub(X,Y,Z) :- fd_sub(X,Y,Z).
@@ -136,6 +138,21 @@ fread_all(F,S) :- read_string(F,"","",_,S).
 fread_char(F,S) :- read_string(F,1,S).
 fread_custom(F,A,B,C,S) :- read_string(F,A,B,C,S).
 
+% net %
+
+socket(S) :- tcp_socket(S).
+socket_bind(S,H) :- tcp_bind(S,H).
+socket_listen(S,B) :- tcp_listen(S,B).
+socket_open(S,I,O) :- tcp_open_socket(S,I,O).
+socket_accept(S,L,P) :- tcp_accept(S,L,P).
+socket_close(S) :- tcp_close_socket(S).
+
+% streampool %
+
+add_stream(S,G) :- add_stream_to_pool(S,G).
+delete_stream(S) :- delete_stream_from_pool(S).
+main_loop :- stream_pool_main_loop.
+
 % global(X) :- new(G1), G1=X.
 
 % generic_call(Env,Obj,Method,Arg) :- global_call(Obj,Method,Arg) -> true ; get(Env,Obj,_t2),Arg2=[_t2|Arg],obj_call(Env,Obj,Method,Arg2).
@@ -155,6 +172,7 @@ closure_call(Env,Closure,Arg) :- closure(Method,MethodEnv)=Closure, _t2=Method, 
 :- ensure_loaded("io.pl").
 :- ensure_loaded("logic.pl").
 :- ensure_loaded("table.pl").
+:- ensure_loaded("net.pl").
 
 custom_var(Name, X) :- (write(Name), write(" = "), (logic_env(T),logic_toString(T,X,S), write(S))).
 custom_vars(N,A) :- A = [] -> write("true") ;
