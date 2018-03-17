@@ -1,5 +1,5 @@
-functor(Cons,Functor)
-functor(Token,Functor)
+functor(Cons, Functor)
+functor(Token, Functor)
 
 require('lexer', lexer)
 require('parser', parser)
@@ -7,16 +7,16 @@ require('whitespacer', whitespacer)
 require('gen', gen)
 
 rel run_all(s, x, module, opts)
-	lexer.run(s,0,l)
-	whitespacer.run(l,l2)
+	lexer.run(s, 0, l)
+	whitespacer.run(l, l2)
 	parser.parse_world(l2, _, fc)
-	gen.generate_chunk(fc,x, module, opts)
+	gen.generate_chunk(fc, x, module, opts)
 
 rel run_query(s, x, prefix, module, query_vars)
-	lexer.run(s,0,l)
-	whitespacer.run(l,l2)
+	lexer.run(s, 0, l)
+	whitespacer.run(l, l2)
 	if(parser.parse_body(l2, lfinal, fc))
-		lfinal=[Token(_,'EOF',_)]
+		lfinal=[Token(_, 'EOF', _)]
 	else
 		logic.throw("cannot parse query")
 	gen.generate_query(fc, x, prefix, query_vars, module)
@@ -25,15 +25,15 @@ rel compile_to_file(module, fname2, code, opts)
 	String name1=''+module+'.'+'cosmos'
 	io.readFile(name1, s)
 	this.run_all(s, code0, module, opts)
-	if(list.has(opts,'--main'))
+	if(list.has(opts, '--main'))
 		code = code0 + '\nmain :- current_prolog_flag(argv, A), list_atom_string(A, B), '+module+'_env(T), '+module+'_main(T,B).'
 	else
 		code = code0
 	io.writeToFile(fname2, code)
 
 rel run_file(fname, code)
-	io.readFile(fname,s)
-	once this.run_all(s,code,'temp', [])
+	io.readFile(fname, s)
+	once this.run_all(s, code, 'temp', [])
 
 rel compile(code_cosmos, code_prolog, module)
 	once this.run_all(code_cosmos, code_prolog, module, [])
@@ -44,11 +44,11 @@ rel compile_module(module, x, opts)
 	
 rel eval_vars(code, prefix, vars, module)
 	name='.temp.pl'
-	list.map(vars, rel(x,s) s='_'+x;, v2)
+	list.map(vars, rel(x, s) s='_'+x;, v2)
 	list.join(v2, ', ', v3)
 	file_code=':- style_check([-singleton,-no_effect]), ensure_loaded("core.pl").\n'+prefix+module+'('+v3+') :- '+code+'.'
 	io.writeToFile(name, file_code)
-	list.map(vars, rel(_,y) y=z;, v4)
+	list.map(vars, rel(_, y) y=z;, v4)
 	pl::consult(name)
 	pl::atom_string(atom_temp, 'temp')
 	pl::atom_string(atom_writeln, 'writeln')
@@ -74,7 +74,7 @@ rel do_query_module(q, module)
 	eval_vars(code_query, '', vars, 'temp')
 
 rel find_flag0(args, flag)
-	if(args = Cons(a,b))
+	if(args = Cons(a, b))
 		if(a = flag)
 			true
 		else
@@ -83,7 +83,7 @@ rel find_flag0(args, flag)
 		false
 
 rel find_flag1(args, flag, name)
-	if(args = Cons(a,b))
+	if(args = Cons(a, b))
 		b = Cons(c, d)
 		if(a = flag)
 			c = name
@@ -103,7 +103,7 @@ rel main(args)
 		else
 			opts=[]
 		if(find_flag0(args, '--main'))
-			list.push(opts,'--main',opts2)
+			list.push(opts, '--main', opts2)
 			compile_module(name, code0, opts2)
 			code = code0 + '\nmain :- current_prolog_flag(argv, A), list_atom_string(A, B), '+name+'_env(T), '+name+'_main(T,B).'
 		else

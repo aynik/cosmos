@@ -4,6 +4,8 @@
 :- use_module(library(socket)).
 :- use_module(library(streampool)).
 
+% math %
+
 add(X, Y, Z) :-
 	fd_add(X, Y, Z).
 
@@ -124,6 +126,8 @@ integer_float(N, X) :-
 float_integer(N, X) :-
 	X is integer(N).
 
+% application %
+
 apply_id(P, A) :-
 	apply(P, A).
 
@@ -134,6 +138,13 @@ apply_catch(C1, A1, C2) :-
 	C1=closure(P, T1),
 	C2=closure(Q, T2),
 	catch(apply(P, [T1|A1]), E, apply(Q, [T2, E])).
+
+apply_once(Closure, Args) :-
+	Closure=closure(Pred, Env),
+	Args2=[Env|Args],
+	once(apply(Pred, Args2)).
+
+% list %
 
 list_of(X, Closure, Args, L) :-
 	Closure=closure(Pred, Env),
@@ -149,10 +160,7 @@ list_atom_string(L1, L2) :-
 	L2=[H2|T2],
 	list_atom_string(T, T2).
 
-apply_once(Closure, Args) :-
-	Closure=closure(Pred, Env),
-	Args2=[Env|Args],
-	once(apply(Pred, Args2)).
+% string %
 
 number_to_string(N, S) :-
 	number_string(N, S).
@@ -225,7 +233,6 @@ replace_word(Old, New, Orig, Replaced) :-
 	atomic_list_concat(Split, Old, Orig),
 	atomic_list_concat(Split, New, Replaced).
 
-
 % records %
 
 new(T) :-
@@ -242,6 +249,8 @@ set(T, Key, Value, T2) :-
 
 each(T, P, T2) :-
 	map_assoc(P, T2).
+
+% io %
 
 fopen(Filename, Mode, File) :-
 	(   Mode="read"
@@ -268,7 +277,6 @@ fread_char(F, S) :-
 fread_custom(F, A, B, C, S) :-
 	read_string(F, A, B, C, S).
 
-
 % net %
 
 socket(S) :-
@@ -289,7 +297,6 @@ socket_accept(S, L, P) :-
 socket_close(S) :-
 	tcp_close_socket(S).
 
-
 % streampool %
 
 add_stream(S, G) :-
@@ -301,11 +308,7 @@ delete_stream(S) :-
 main_loop :-
 	stream_pool_main_loop.
 
-
-% global(X) :- new(G1), G1=X.
-
-
-% generic_call(Env,Obj,Method,Arg) :- global_call(Obj,Method,Arg) -> true ; get(Env,Obj,_t2),Arg2=[_t2|Arg],obj_call(Env,Obj,Method,Arg2).
+% runtime %
 
 obj_call2(Env, Obj, Method, Arg) :-
 	get(Env, Obj, _t1),
@@ -370,4 +373,3 @@ custom_vars0(N, A) :-
 
 apply_forall_custom_vars(G1, N, A1) :-
 	forall(apply(G1, A1), apply(custom_vars0, [N, A1])).
-

@@ -11,6 +11,8 @@ math_OPTS=$(STDLIB_OPTS)
 io_OPTS=$(STDLIB_OPTS)
 logic_OPTS=$(STDLIB_OPTS)
 table_OPTS=$(STDLIB_OPTS)
+net_OPTS=$(STDLIB_OPTS)
+streampool_OPTS=$(STDLIB_OPTS)
 
 %.pl: %.cosmos
 	$(COSMOS) $($*_OPTS) --module $(patsubst %.cosmos,%,$<)
