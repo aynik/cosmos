@@ -55,13 +55,6 @@ compiler: cosmos.pl types.pl
 cosmos:
 	$(SWIPL) -t halt -o cosmos -g main -c $@.pl
 
-# tests
-test0.pl: test1.pl
-
-test: test0.pl test1.pl
-	$(COSMOS) --module test0
-	$(COSMOS) --module test1
-
 # rebuild
 rebuild:
 	# build frontend with current compiler and stdlib modules
@@ -69,4 +62,4 @@ rebuild:
 	$(MAKE) compiler-clean
 	$(MAKE) compiler cosmos
 	$(MAKE) stdlib-clean
-	$(MAKE) stdlib compiler-clean compiler cosmos test-clean test
+	$(MAKE) stdlib compiler-clean compiler cosmos
