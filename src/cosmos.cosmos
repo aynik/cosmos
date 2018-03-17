@@ -56,7 +56,6 @@ rel eval_vars(code, prefix, vars, module)
 
 rel interpreter()
 	module = 'temp'
-	io.write('> ')
 	io.read(input)
 	if(logic.applyCatch(run_query, [input, code, prefix, module, vars], rel(e) io.writeln('CosmosError: '+e) and false;))
 		logic.applyCatch(eval_vars, [code, prefix, vars, module], rel(e) io.write('RuntimeError: ') and pl::writeln(e);)

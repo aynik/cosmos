@@ -1,8 +1,8 @@
 rel add(s, g)
-	pl::add_stream(s, g)
+	pl::add_stream_to_pool(s, g)
 
 rel delete(s)
-	pl::delete_stream(s)
+	pl::delete_stream_from_pool(s)
 
 rel loop()
-	pl::main_loop()
+	pl::stream_pool_main_loop()

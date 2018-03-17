@@ -3,6 +3,8 @@
 :- use_module(library(assoc)).
 :- use_module(library(socket)).
 :- use_module(library(streampool)).
+:- use_module(library(http/thread_httpd)).
+:- use_module(library(http/http_dispatch)).
 
 % math %
 
@@ -263,6 +265,7 @@ fopen(Filename, Mode, File) :-
 	).
 
 ioread(S) :-
+	prompt(_, '? '),
 	read_string(user_input, "\n", "\r", _, S).
 
 fread(F, S) :-
@@ -276,37 +279,6 @@ fread_char(F, S) :-
 
 fread_custom(F, A, B, C, S) :-
 	read_string(F, A, B, C, S).
-
-% net %
-
-socket(S) :-
-	tcp_socket(S).
-
-socket_bind(S, H) :-
-	tcp_bind(S, H).
-
-socket_listen(S, B) :-
-	tcp_listen(S, B).
-
-socket_open(S, I, O) :-
-	tcp_open_socket(S, I, O).
-
-socket_accept(S, L, P) :-
-	tcp_accept(S, L, P).
-
-socket_close(S) :-
-	tcp_close_socket(S).
-
-% streampool %
-
-add_stream(S, G) :-
-	add_stream_to_pool(S, G).
-
-delete_stream(S) :-
-	delete_stream_from_pool(S).
-
-main_loop :-
-	stream_pool_main_loop.
 
 % runtime %
 

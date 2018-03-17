@@ -1,0 +1,48 @@
+require('net', net)
+require('streampool', streampool)
+
+rel http_not_found(response)
+	response = 'HTTP/1.0 404 Not Found\r\n'
+
+rel http_ok(body, response)
+	string.size(body, length)
+	string.concat('Content-Length: ', length, lengthHeader)
+	string.concat(lengthHeader, '\r\n\r\n', headers)
+	string.concat('HTTP/1.0 200 OK\r\n', headers, top)
+	string.concat(top, body, response)
+
+rel home(response)	
+	http_ok('<html><head></head><body><p>Hello</pre></body></html>', response)
+
+rel parse(request, path)
+	string.concat(prefix, suffix, request)
+	string.concat('GET /', path, prefix)
+	string.concat(' HTTP/', _, suffix)
+
+rel dispatch(path, response)
+	if(path='' or path='/')
+		home(response)
+	else
+		http_not_found(response)
+
+rel handle(in, out)
+	io.fileRead(in, request)
+	parse(request, path)
+	streampool.delete(in)
+	io.close(in)
+	once dispatch(path, response)
+	io.fileWrite(out, response)
+	io.close(out)
+
+rel accept(socket)
+	net.accept(socket, slave, peer)
+	net.open(slave, in, out)
+	streampool.add(in, @handle(in, out))
+
+rel main(args)
+	net.socket(socket)
+	net.bind(socket, 3000)
+	net.listen(socket, 5)
+	net.open(socket, in, out)
+	streampool.add(in, @accept(socket)) 
+	streampool.loop()
