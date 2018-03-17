@@ -1,4 +1,4 @@
-functor(Var, Functor) //Var(name, object|local|args, type)
+functor(Var, Functor)
 functor(Local, Functor)
 functor(Lib, Functor)
 
@@ -76,7 +76,7 @@ rel extract_type_information(String fname, Functor x)
 */
 
 rel env_init(env, vars, fcs, lambda)
-	env=[vars, fcs, lambda, Cons] //vars, functors
+	env=[vars, fcs, lambda, Cons]
 	
 rel env_vars(env, x)
 	env=[x, _, _, _]
@@ -192,17 +192,10 @@ rel id_var(x, y)
 	y=Var(name, 'local', t)
 	
 rel compare_relation(fvar, args, env, env2, info)
-	/*io.writeln('comparing')
-	io.rawWriteln(args)
-	io.rawWriteln(fvar)*/
 	fvar=Var(name,_,t1)
 	extract_type_args(args,targs,env)
-	//list.filter(args, is_id, ids)
-	//list.fold(ids, env_push, env, env_a)
 	specialize_args(args,targs,env,env2)
 	t2=Cons('Relation',targs)
-	//io.writeln(t1)
-	//io.writeln(t2)
 	if(types.compare_types(t1,t2))
 		true
 	else
@@ -317,9 +310,9 @@ rel extract_name(Functor f, String s2, env, env2, String prefix, String module)
 			s2='_'+name
 	elseif(f=Num(s))
 		env=env2
-		if(string.has(s,'.')) //float
+		if(string.has(s,'.'))
 			s2=s
-		else //integer
+		else
 			s2=''+s
 		prefix=''
 	elseif(f=Op(a,b,op,info))
@@ -332,7 +325,6 @@ rel extract_name(Functor f, String s2, env, env2, String prefix, String module)
 			true
 		else
 			custom_throw('using operator "'+op+'" on types "'+types.type_to_string(ta)+'" and "'+types.type_to_string(tb)+'" (values must have the same type)', info)
-		//if(types.compare_types(ta,['Number']) or types.compare_types(ta,['Integer']))
 		if(ta=['Number'] or ta=['Integer'])
 			sop='fd_'
 		elseif(ta=['Real'])
@@ -343,11 +335,11 @@ rel extract_name(Functor f, String s2, env, env2, String prefix, String module)
 			sop='r_'
 		else
 			sop=''
-		if(sop='') //not a numeric operation
+		if(sop='')
 			if(op='+')
-				if(ta=['Any']) //runtime addition
+				if(ta=['Any'])
 					fn='dynamic_add'
-				else //string concatenation
+				else
 					fn='string_concat'
 			else
 				if(ta=['Any'])
@@ -410,16 +402,14 @@ rel extract_name(Functor f, String s2, env, env2, String prefix, String module)
 				make_local_string('',name,sargs2,prefix2)
 			elseif(fvar=Var(_,'args',_))
 				make_local_string('',name,sargs2,prefix2)
-			else //is method of current object
+			else
 				make_this_string('',name,sargs2,prefix2)
-				//control.throw(msg)
 			prefix=prefix1+prefix2+','
 		else
 			msg='cannot call variable of unknown type: '+name
 			custom_throw(msg, info)
 
-	elseif(f=Func(obj,name,args,info)) //ObjFunc
-		//env=env2
+	elseif(f=Func(obj,name,args,info))
 		if(env_get_types(env, obj, ts) and ts!=[])
 			if(_env_get_var(ts,name,fvar))
 				list.concat(args,['Any'],args2)
@@ -445,63 +435,59 @@ rel extract_name(Functor f, String s2, env, env2, String prefix, String module)
 		
 	elseif(f=TTable(args))
 		env=env2
-		//extract_list(args,sargs,env,prefix)
 		gensym('T',s2)
 		prefix='new('+s2+'),'
 		
-	elseif(f=Rel(args1,body1)) //anonymous relation
+	elseif(f=Rel(args1,body1))
 		generate_lambda(s2,prefix,env_lambdas(env),module)
 		env_push_lambda(env, Rel('',args1,body1), env2)
 	
 rel extract_type(f,type,env)
 	if(f=Num(s))
-		if(string.has(s,'.')) //real
+		if(string.has(s,'.'))
 			type=['Real']
-		else //integer
+		else
 			type=['Integer']
 	elseif(f=Str(_))
 		type=['String']
 	elseif(f=Id(name, type_id))
-		if(type_id!=[]) //type annotation is not empty, this is a declaration
+		if(type_id!=[])
 			type_id=Cons(type_name, _)
 			if(list.has(['Any','Number','Integer','Real','Functor','Relation','String','Table','File'], type_name))
 				type=type_id
 			else
 				logic.throw('"'+type_name+'" is not a type')
-		elseif(env_get(env,fvar)) //variable is already defined
+		elseif(env_get(env,fvar))
 			fvar=Var(name,_,type_var)
 			if(type_var=[])
 				type=['Any']
 			elseif(type_var=['FunctorObject'])
 				env_get_functor(env, name, fc_var)
 				fc_var=Var(_,_,type)
-				//type=['Functor']
 			else
 				type=type_var
 		elseif(env_has_var(env,Lib(_, name))) //name of module
 			type=['Table']
-		else //empty type annotation, use Any
+		else
 			type=['Any']
 	elseif(f=Func(name, args, info))
 		is_type(name, ftype, env)
 		if(ftype = 'FunctorObject')
 			extract_type_args(args,targs,env)
 			type = Cons('Functor', targs)
-			//check against FunctorObject type
-			env_get_functor(env, name, var_fc) //functor confirmed to be in env
+			env_get_functor(env, name, var_fc)
 			compare_functor(var_fc, args, env, info)
 		else
 			ftype='Relation'
 			env_get_var(env,name,fvar)
 			fvar=Var(_,_,t1)
-			list.last(t1,type) //gets type of last parameter
+			list.last(t1,type)
 	elseif(f=Func(obj, name, args, info))
-		//is_type(name, ftype, env)
 		if(env_get_types(env, obj, ts) and ts!=[])
 			_env_get_var(ts,name,fvar)
 			fvar=Var(_,_,t1)
 			list.concat(args,['Any'],args2)
-			list.last(t1,type) //gets type of last parameter
+			list.last(t1,type)
 		else
 			type=['Any']
 	elseif(f=Rel(args, _))
@@ -612,14 +598,12 @@ rel stringfy_rel(String name, args, f1, code, env, lambdas, module)
 		sa='Env0'
 	else
 		sa='Env0,'
-	env_lambdas(env_a, lambdas) //pass the lambdas of env_a to env2
-	//make_lambdas(lambdas, l_lambdas, list.size(lambdas)-1, env, module)
+	env_lambdas(env_a, lambdas)
 	header=''+name+'('+sa+sargs+') :- '
-	code=/*list.join(l_lambdas, '') + */header + sbody + '.\n'
-	//env_set_lambdas(env_a, lambdas, env2)
+	code=header+sbody+'.\n'
 
 rel generate_cond(l, code, env, env2, module)
-	if(l=Cons(c,Cons(d, l2))) //elseif(c) d
+	if(l=Cons(c,Cons(d, l2)))
 		generate_body(c,sc,env,env_a,module)
 		generate_body(d,sd,env_a,env_b,module)
 		s2='(('+sc+'),'+sd+')'
@@ -629,7 +613,7 @@ rel generate_cond(l, code, env, env2, module)
 		else
 			generate_cond(l2, code1, env_b, env2, module)
 			code=s2+';'+code1
-	elseif(l=Cons(c,Cons)) //else c
+	elseif(l=Cons(c,Cons))
 		generate_body(c,sc,env,env2,module)
 		code='('+sc+')'
 	elseif(l=Cons)
@@ -639,12 +623,10 @@ rel generate_cond(l, code, env, env2, module)
 rel specialize_type(env, a, ta, tb, env2)
 	if(a=Id(name,_))
 		if(types.strict_type(ta,tb,tc))
-			//io.writeln('strict type')
-			//io.writeln(tc)
 			env_push_if_not_found(env, Var(name,'local',tc), env2)
 		else
 			io.writeln([ta,tb])
-			logic.throw("no strict") //todo: ???
+			logic.throw("no strict")
 	else
 		env2=env
 		
@@ -694,7 +676,6 @@ rel generate_body(Functor f, code, env, env2, module)
 			if(op='=')
 				code=''+prefix1+prefix2+'eq('+sa+','+sb+')'
 			else
-				//check inequality operator
 				if(op='!=')
 					fn='neq'
 				elseif(op='<')
@@ -705,7 +686,6 @@ rel generate_body(Functor f, code, env, env2, module)
 					fn='gt'
 				elseif(op='>=')
 					fn='ge'
-				//check types being compared
 				if(ta=['Integer'] or ta=['Number'])
 					s_op='fd'
 				elseif(ta=['Real'])
@@ -714,8 +694,6 @@ rel generate_body(Functor f, code, env, env2, module)
 					s_op='fd'
 				elseif(tb=['Real'])
 					s_op='r'
-				//elseif(ta=['Any'])
-				//	s_op='fd'
 				else
 					if(op='!=')
 						s_op=''
@@ -733,7 +711,7 @@ rel generate_body(Functor f, code, env, env2, module)
 		else
 			custom_throw('cannot compare type "'+types.type_to_string(ta)+'" with type "'+types.type_to_string(tb)+'"', info)
 	
-	elseif(f=Rel(name,args,f1)) //definition in body
+	elseif(f=Rel(name,args,f1))
 		generate_lambda(s1,prefix,env_lambdas(env),module)
 		code='eq(_'+name+','+s1+')'
 		extract_type_args(args,type,env)
@@ -748,7 +726,7 @@ rel generate_body(Functor f, code, env, env2, module)
 				make_local_string(prefix,name,sargs,code)
 			elseif(fvar=Var(_,'args',_))
 				make_local_string(prefix,name,sargs,code)
-			else //is method of current object
+			else
 				make_this_string(prefix,name,sargs,code)
 		else
 			custom_throw('cannot find relation '+name, info)
@@ -770,14 +748,12 @@ rel generate_body(Functor f, code, env, env2, module)
 					else
 						custom_throw('cannot find relation '+name+' in module '+obj, info)
 				else
-					//lib has no type information?
-					//io.writeln('lib has no type information')
 					env2=env
 				code=prefix+'obj_call2(Env0,"'+obj+'",'+'"'+name+'",'+"["+sargs+"])"
 			else
 				custom_throw('cannot find module \"'+obj+'"', info)
 	
-	elseif(f=Cond(a,b,l)) //if(a) b [l]
+	elseif(f=Cond(a,b,l))
 		generate_body(a, sa, env, env_a, module)
 		generate_body(b, sb, env_a, env_b, module)
 		generate_cond(l, scond, env_b, env2, module)
@@ -830,9 +806,6 @@ rel generate_world(f, code, env1, env2, module)
 		env_push(env1, Var(sa,sb,['Any']), env2)
 		code=''
 	elseif(f=Rel(name,args,f1))
-		/*if(is_relation(name, env1))
-			msg=('relation "',name,'" is already defined')
-			logic.throw(msg)*/
 		extract_type_args_and_push_into_env(args,type,env1,env_fn)
 		fvar = Var(name,'object',Cons('Relation',type))
 		sname=module+'_'+name
@@ -856,16 +829,13 @@ rel generate_world(f, code, env1, env2, module)
 			if(arg2=[])
 				type=[arg1]
 			else
-				list.concat(arg2, [[arg1]], type) //add last name (arg1) to the end of type
+				list.concat(arg2, [[arg1]], type)
 			type=Cons(first_type, _)
 			if(first_type!='Functor')
 				custom_throw('type "'+first_type+'" is not a "Functor"', info)
 			env_push(env1, Var(arg0,'object',['FunctorObject']), env_a)
 			env_push_functor(env_a, Var(arg0,'',type), env2)
 		else
-			/*extract_args(args,sargs,env1,_)
-			code=(name+'('+sargs+')'+'.\n')
-			env2=env1*/
 			custom_throw("only the relations 'require' and 'functor' are accepted here", info)
 	elseif(f=Declaration(name, type))
 		env_push(env1, Var(name,'object',type), env2)
@@ -940,14 +910,11 @@ rel generate_query(Functor f, String code, String prefix, Functor query_vars, mo
 		extract_module(module,ts)
 		list.fold(ts, env_push, env_b, env)
 	generate_body(f, s1, env, env2, module)
-	//get query variables
 	list.filter(env_vars(env2), rel(x) x=Var(_,'local',Cons(t0,_)) and t0!='FunctorObject';, xx1)
 	list.map(xx1, rel(x,y) x=Var(y,_,_);, xx2)
 	pl::list_to_set(xx2, query_vars)
-	//libs
 	make_binds(env_vars(env2), 0, j, s, module)
 	String prefix0 = ''+module+'_env(X) :- new(X0)'+s+',X=X'+math.integerToString(j)+'.\n'
-	//temporary functions
 	env_lambdas(env2, lambdas)
 	make_lambdas(lambdas, l_temp_functions, list.size(lambdas)-1, env2, module)
 	list.join(l_temp_functions, '', prefix1)

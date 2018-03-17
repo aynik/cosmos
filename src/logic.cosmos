@@ -57,7 +57,7 @@ rel toString(Any x, String s)
 		s='#relation'
 	elseif(pl::var(x))
 		s = '#var'
-	elseif(pl::is_assoc(x)) //table
+	elseif(pl::is_assoc(x))
 		rel bindingToString(b, s)
 			pl::get_binding(b, key, value)
 			s = toString(key) + ' = ' + toString(value)
@@ -66,11 +66,11 @@ rel toString(Any x, String s)
 		s = '{'+s0+'}'
 	elseif(pl::atom(x)) 
 		pl::atom_string(x, s0)
-		if(string.slice(s0, 0, 2, 'fc')) //atomic functor
+		if(string.slice(s0, 0, 2, 'fc'))
 			string.slice(s0, 2, string.size(s0), s)
-		else //relation
+		else
 			s='#relation'
-	elseif(pl::compound(x)) //functor
+	elseif(pl::compound(x))
 		pl::functor_info(x, s0, args)
 		s = string.slice(s0, 2, string.size(s0)) + '(' + list.join(list.map(args, toString), ', ') + ')'
 	elseif(pl::number(x))

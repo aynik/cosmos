@@ -1,17 +1,17 @@
 rel socket(s)
-  pl::socket(s)
+	pl::socket(s)
 
 rel bind(s, h)
-  pl::socket_bind(s, h)
+	pl::socket_bind(s, h)
 
 rel listen(s, b)
-  pl::socket_listen(s, b)
+	pl::socket_listen(s, b)
 
 rel open(s, i, o)
-  pl::socket_open(s, i, o)
+	pl::socket_open(s, i, o)
 
 rel accept(s, l, p)
-  pl::socket_accept(s, l, p)
+	pl::socket_accept(s, l, p)
 
 rel close(s)
-  pl::socket_close(s)
+	pl::socket_close(s)

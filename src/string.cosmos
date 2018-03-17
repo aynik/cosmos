@@ -119,16 +119,12 @@ rel _toList(String s, Integer i, Functor l2)
 		i=size(s)
 		l2=[]
 	
-//e.g. 'abc' ==> ['a','b','c']
 rel toList(String s, Functor l)
 	_toList(s, 0, l)
 	
-//e.g. 'abc' ==> [97,98,99]
 rel toCodes(String s, Functor l)
 	pl::string_codes(s,l)
-	//pl::s_codes(s,l)
 
-//gets code of char (string must have size 1)
 rel code(String s, Integer n)
 	toCodes(s,[n])
 	
@@ -137,4 +133,3 @@ rel lessOrEqual(String S1, String S2)
 
 rel _add(s1,s2,s3)
 	concat(s1,s2,s3)
-	

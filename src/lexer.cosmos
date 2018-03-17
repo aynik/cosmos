@@ -1,7 +1,7 @@
 functor(Tuple, Functor)
 functor(Cons, Functor)
 functor(Token, Functor)
-functor(Info, Functor) //Info(line,column)
+functor(Info, Functor)
 
 rel digit(c)
 	string.lessOrEqual(c,'9')
@@ -67,7 +67,6 @@ rel navigate_until_asterisk(s,i,i2,info,info2)
 			info1=Info(line, col+1)
 		this.navigate_until_asterisk(s,i+1,i2,info1,info2)
 	
-//parses comment and updates line/column information
 rel navigate_comment(s,i,i2,info,info2)
 	if(this.match_string(s,i,x,'//'))
 		info2=info
@@ -80,7 +79,6 @@ rel navigate_comment(s,i,i2,info,info2)
 		this.navigate_until_asterisk(s,x,y,info,info2)
 		this.match_string(s,y,i2,'*/')
 
-//parses whitespace and updates line/column information
 rel navigate_ws2(String s,Integer i,Integer i2,line,col,info2)
 	if(string.at(s,i,c))
 		if(c='\n')
@@ -103,8 +101,6 @@ rel navigate_whitespace(s,i,i2,info,info2)
 	else
 		navigate_ws2(s,i+1,i2,line,col,info2)
 		
-//matching relations
-
 rel match_whitespace(s,i,i2)
 	match_some(s,i,i2,this.whitespace)
 
@@ -140,7 +136,6 @@ rel parse_id(s,i,i2)
 	match_some(s,i,x,p)
 	match_any(s,x,i2,this.digit)
 	
-//tries to find if word c is in list, if so set c=z
 rel match_list(l,s,z)
 	l=Cons(head, tail)
 	choose(head=s)

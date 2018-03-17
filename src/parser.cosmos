@@ -2,20 +2,6 @@ functor(Cons, Functor)
 functor(Token, Functor)
 functor(Info, Functor)
 
-/*
-	world = rel|world 'and' world
-	rel = 'rel' (args) body;
-	body = inequality | rel | pred | obj_pred | body conn body | cond | type id
-	cond = 'if' (body) body;
-		| 'if' (body) body else body;
-	inequality = exp '=' exp|exp '!=' exp|exp '<' exp|exp '>' exp|exp '<=' exp|exp '>=' exp
-	exp = ... | math
-	math = exp+exp|exp-exp|exp*exp|exp/exp
-		
-	conn = 'and'|'or'
-*/
-
-//'body'
 functor(Eq, Functor)
 functor(Neq, Functor)
 functor(Inequality, Functor)
@@ -35,11 +21,9 @@ functor(Host, Functor)
 functor(Once, Functor)
 functor(Declaration, Functor)
 
-//'world'
 functor(Rel, Functor)
 functor(Fact, Functor)
 
-//'expression'
 functor(Num, Functor)
 functor(Str, Functor)
 functor(Id, Functor)
@@ -104,13 +88,12 @@ rel name_list_to_type2(l,l2)
 		this.name_list_to_type2(tail, tail2)
 		l2=Cons([head], tail2)
 		
-//e.g. [Rel, Num] ==> [Rel, [Num]]
 rel name_list_to_type(l,l2)
 	if(l=[])
 		l2=l
-	elseif(l=[a]) //atomic type
+	elseif(l=[a])
 		l2=l
-	else //composite type
+	else
 		l=Cons(a,tail)
 		this.name_list_to_type2(tail,tail2)
 		l2=Cons(a,tail2)
@@ -161,7 +144,6 @@ rel parse_list(l,tail,f)
 
 rel parse_table(l,tail,f)
 	l = Cons(Token(_,'{',_),l2)
-	//this.parse_args(l2,l3,args)
 	l2=l3
 	l3=Cons(Token(_,'}',_),tail)
 	f=TTable(args)
@@ -171,7 +153,6 @@ rel exp_to_functor(l,tail,f)
 	l=Cons(Token(_,'-',_), Cons(Token(a,'number',_), tail)) and f=Num('-'+a) or
 	l=Cons(Token(a,'number',_), tail) and f=Num(a)
 
-//parses atomic expression
 rel parse_exp2(l,tail,f)
 	parse_exp_obj_call(l,tail,f) or
 	parse_obj_get(l,tail,f) or
@@ -185,15 +166,13 @@ rel parse_exp2(l,tail,f)
 	
 Relation parse_math0
 
-//parses expressions joined by math operators
 rel parse_math2(l,tail,prev,f)
 	parse_string(l,l2,op)
 	if(op='+' or op='-' or op='*' or op='/')
-		if(parse_string(l2,l3,'(')) //rightmost bracket expression
+		if(parse_string(l2,l3,'('))
 			parse_math0(l3,l4,b)
 			parse_string(l4,tail,')')
 			f = Op(prev,b,op,get_info(l))
-			//logic.throw('brackets')
 		else
 			parse_exp2(l2,l4,b)
 			fcur = Op(prev,b,op,get_info(l))
@@ -216,7 +195,7 @@ rel parse_math1(l,tail,f)
 	
 rel parse_math0(l,tail,f)
 	parse_string(l,l2,s)
-	if(s='(') //get entire expression within bracket
+	if(s='(')
 		parse_math0(l2,l3,f1)
 		parse_string(l3,l4,')')
 		parse_math2(l4,tail,f1,f2)
@@ -277,7 +256,7 @@ rel parse_host(l,tail,code)
 	code=Host(obj, str)
 	
 rel parse_declaration(l,tail,code)
-	this.parse_name(l,tail,type,name) //todo: throw error when type is empty (doesn't work now due to backtracking)
+	this.parse_name(l,tail,type,name)
 	code=Declaration(name,type)
 
 rel parse_true(l,tail,f)

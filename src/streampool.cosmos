@@ -1,8 +1,8 @@
 rel add(s, g)
-  pl::add_stream(s, g)
+	pl::add_stream(s, g)
 
 rel delete(s)
-  pl::delete_stream(s)
+	pl::delete_stream(s)
 
 rel loop()
-  pl::main_loop()
+	pl::main_loop()
